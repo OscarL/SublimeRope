@@ -7,6 +7,7 @@ import tempfile
 from rope.base import project, libutils
 from rope.base.fscommands import FileSystemCommands
 from rope.contrib import autoimport
+from ropehints.ropehints import CompositeHintProvider
 
 project_cache = {}
 
@@ -51,6 +52,7 @@ class RopeContext(object):
 
         if not single_file and self.project_dir:
             self.project = project.Project(self.project_dir, fscommands=FileSystemCommands())
+            _refresh_hints(self.project)
             self.importer = autoimport.AutoImport(
                 project=self.project, observe=False)
             if os.path.exists("%s/__init__.py" % self.project_dir):
@@ -138,3 +140,23 @@ def _update_python_path(paths):
     # Reorder sys.path so new directories at the front.
     new_sys_path_items = set(sys.path) - set(old_sys_path_items)
     sys.path = list(new_sys_path_items) + old_sys_path_items
+
+
+def _refresh_hints(project):
+    if project.ropefolder:
+        hints_filename = os.path.join(project.ropefolder.real_path, 'ropehints.py')
+    else:
+        hints_filename = None
+
+    project.pycore.module_cache.forget_all_data()
+    project.pycore.hintdb = CompositeHintProvider(project)
+
+    if hints_filename and os.path.exists(hints_filename):
+        namespace = {}
+        execfile(hints_filename, namespace)
+        if 'init' in namespace:
+            try:
+                namespace['init'](project.pycore.hintdb)
+            except:
+                import traceback
+                traceback.print_exc()
