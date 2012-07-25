@@ -7,11 +7,13 @@ import rope.base.builtins
 
 from rope.base import exceptions
 
-from .ropehints import HintProvider, get_attribute_scope_path
+from ropehints import HintProvider, get_attribute_scope_path
+
 
 def add_django_support(composite_provider, settings='settings'):
     return composite_provider.add_hint_provider(
         DjangoHintProvider(composite_provider.project, settings))
+
 
 def get_path_and_package(module_path, project_root):
     packages = [os.path.basename(module_path).rpartition('.')[0]]
@@ -32,7 +34,10 @@ def get_path_and_package(module_path, project_root):
 
     return module_path, '.'.join(reversed(packages))
 
+
 loaded_django_modules = {}
+
+
 def load_django_module(pymodule, project_root):
     path = os.path.realpath(pymodule.resource.real_path)
     try:
@@ -104,6 +109,7 @@ class DjangoObjectsName(rope.base.pynames.PyName):
 
 def proxy(obj):
     cls = obj.__class__
+
     class Cls(cls):
         def __init__(self, obj):
             self._orig = obj
@@ -115,12 +121,14 @@ def proxy(obj):
 
     return Cls(obj)
 
+
 class GetHolder:
     def __init__(self, result):
         self.result = result
 
     def get(self, *args):
         return self.result
+
 
 class DjangoObjectsObject(object):
     def __init__(self, pyclass, obj):

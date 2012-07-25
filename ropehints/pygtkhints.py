@@ -7,9 +7,10 @@ from rope.base.exceptions import ModuleNotFoundError
 
 import gobject
 
-from .ropehints import HintProvider, get_attribute_scope_path
+from ropehints import HintProvider, get_attribute_scope_path
 
 pydoc_glade_file_matcher = re.compile('(?m)^.*glade-file\s*:(.*)$')
+
 
 def add_gtk_support(composite_provider):
     add_gtk_extension_modules(composite_provider.project)
@@ -18,6 +19,7 @@ def add_gtk_support(composite_provider):
         'snaked.plugins.python.pygtk_stubs.TextBuffer')
 
     return composite_provider.add_hint_provider(PyGtkHintProvider(composite_provider.project))
+
 
 def add_gtk_extension_modules(project):
     existing_modules = project.prefs['extension_modules']

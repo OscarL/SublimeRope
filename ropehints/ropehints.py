@@ -1,4 +1,5 @@
-import re, sys
+import re
+import sys
 
 import weakref
 
@@ -8,6 +9,7 @@ import rope.base.pynames
 from rope.base import exceptions
 from rope.base.pyobjectsdef import PyModule, PyPackage, PyClass
 from rope.base.builtins import BuiltinModule
+
 
 class ReplacedName(rope.base.pynames.PyName):
     def __init__(self, pyobject, pyname):
@@ -27,7 +29,8 @@ def builtin_module(self):
         return sys.modules[self.name]
     except ImportError:
         return
-BuiltinModule.module = property(builtin_module)
+
+#BuiltinModule.module = property(builtin_module)
 
 
 def infer_parameter_objects_with_hints(func):
@@ -72,6 +75,7 @@ def infer_returned_object_with_hints(func):
 rope.base.oi.soi.infer_returned_object = infer_returned_object_with_hints(
     rope.base.oi.soi.infer_returned_object)
 
+
 def get_attribute_scope_path(obj, collected=''):
         if isinstance(obj, (PyModule, PyPackage)):
             if obj.resource:
@@ -95,6 +99,7 @@ def get_attribute_scope_path(obj, collected=''):
             return get_attribute_scope_path(scope.pyobject, collected)
         else:
             return collected
+
 
 def get_attributes_with_hints(func):
     def inner(self):
@@ -203,7 +208,7 @@ class ScopeHintProvider(HintProvider):
 
     def get_function_params(self, scope_path, pyfunc):
         result = {}
-        for i, name in enumerate(pyfunc.get_param_names(False)+['return']):
+        for i, name in enumerate(pyfunc.get_param_names(False) + ['return']):
             type_name = self.matcher.find_param_type_for(scope_path, name)
             if type_name:
                 pyname = self.get_type(type_name)
@@ -231,6 +236,7 @@ class ScopeHintProvider(HintProvider):
                     type.get_object().replaces_name = existing_attributes[name]
 
         return attrs
+
 
 class ScopeMatcher(object):
     """Abstract matcher class for :class:`ScopeHintProvider`"""
@@ -369,13 +375,13 @@ class CompositeHintProvider(HintProvider):
 
         self.db = ReScopeMatcher()
         self.db.add_param_hint('ropehints\.init$', 'provider$',
-            'snaked.plugins.python.ropehints.CompositeHintProvider()')
+            'ropehints.ropehints.CompositeHintProvider()')
 
         self.db.add_param_hint('re\.compile$', 'return$', 're.RegexObject()')
         self.db.add_param_hint('re\.search$', 'return$', 're.MatchObject()')
         self.db.add_param_hint('re\.match$', 'return$', 're.MatchObject()')
-        self.db.add_attribute('re$', 'RegexObject', 'snaked.plugins.python.stub.RegexObject')
-        self.db.add_attribute('re$', 'MatchObject', 'snaked.plugins.python.stub.MatchObject')
+        self.db.add_attribute('re$', 'RegexObject', 'ropehints.stub.RegexObject')
+        self.db.add_attribute('re$', 'MatchObject', 'ropehints.stub.MatchObject')
 
         self.add_hint_provider(ScopeHintProvider(project, self.db))
 

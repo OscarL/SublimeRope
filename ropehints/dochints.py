@@ -1,6 +1,7 @@
 import re
 
-from .ropehints import HintProvider
+from ropehints import HintProvider
+
 
 class DocStringHintProvider(HintProvider):
     """Allows to hint functions/method parameters and return values types through doc strings

@@ -14,5 +14,6 @@ Enable PyGtk support::
 For detailed description look at http://packages.python.org/snaked/python.html#type-hints
 """
 
+
 def init(provider):
     pass
